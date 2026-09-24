@@ -110,14 +110,18 @@
         </div>
 
         <!-- Systems stack (decorative, 1200px and wider): the layers I work across, from the
-             device up to the interface. A signal lights each layer in turn, bottom to top. -->
+             device up to the interface. The layers assemble on load; then on a loop the stack
+             opens into an exploded view, a signal rides a beam from DEVICE to INTERFACE lighting
+             each layer, and it closes again. Packets flow across every layer meanwhile. -->
         <div class="stack" aria-hidden="true">
           <div class="stack__scene">
-            <div class="stack__row" style="--i:0"><b>DEVICE</b><span>ESP32 · sensors</span><span>embedded C++</span></div>
-            <div class="stack__row" style="--i:1"><b>DATA</b><span>PostgreSQL · MongoDB</span><span>schemas · migrations</span></div>
-            <div class="stack__row" style="--i:2"><b>SERVICES</b><span>NestJS · Spring Boot</span><span>REST · auth · jobs</span></div>
-            <div class="stack__row" style="--i:3"><b>REAL TIME</b><span>Socket.io · queues</span><span>BullMQ</span></div>
-            <div class="stack__row" style="--i:4"><b>INTERFACE</b><span>Next.js · React</span><span>web · mobile</span></div>
+            <span class="stack__beam"></span>
+            <div class="stack__row" style="--i:0"><b>DEVICE</b><span>ESP32 · sensors</span></div>
+            <div class="stack__row" style="--i:1"><b>DATA</b><span>PostgreSQL · MongoDB</span></div>
+            <div class="stack__row" style="--i:2"><b>SERVICES</b><span>NestJS · Spring Boot</span></div>
+            <div class="stack__row" style="--i:3"><b>REAL TIME</b><span>Socket.io · queues</span></div>
+            <div class="stack__row" style="--i:4"><b>INTERFACE</b><span>Next.js · React</span></div>
+            <span class="stack__signal"></span>
           </div>
         </div>
       </div>
@@ -132,7 +136,7 @@
         </div>
         <div class="about__body prose">
           <p class="reveal">I'm a backend and systems engineer in Lagos, and a final year Systems Engineering student at the University of Lagos, graduating in September 2027. I like owning a system end to end: the API contract, the data model, the deployment, and the part where it has to keep working when something it depends on fails.</p>
-          <p class="reveal">I'm co-founder and CTO of NePay, where I designed and built the whole backend. Before that I led backend engineering at Grup Limited, a group buying platform, building the REST APIs behind its web and mobile apps and keeping uptime above 99.9%. During my industrial training at Albertronics I worked on smart home automation and embedded systems, and built the company's Next.js storefront with live admin updates. Earlier, I built Java and Spring Boot services for an online store at Phlames Fashion Stores, and cut downtime by 10% as an intern at PIPELINE.</p>
+          <p class="reveal">I'm co-founder and CTO of NePay, where I designed and built the whole backend: 31 feature modules in a single NestJS service. Before that I led backend engineering at Grup Limited, a group buying platform, building the REST APIs behind its web and mobile apps and keeping uptime above 99.9%. During my industrial training at Albertronics I worked on smart home automation and embedded systems, and built the company's Next.js storefront with live admin updates. Earlier, I built Java and Spring Boot services for an online store at Phlames Fashion Stores, and cut downtime by 10% as an intern at PIPELINE.</p>
           <p class="reveal">Most days I write TypeScript and Java (NestJS, Express, Spring Boot) against PostgreSQL, MongoDB and Redis, and I'm just as comfortable up the stack in Next.js and React or down it on an ESP32. My degree adds the other half: simulation, queuing theory and numerical methods shape how I think about load, failure and trade-offs. I work spec-first. Invariants get written down before code, and nothing is ‘done’ until an automated check says so.</p>
         </div>
       </div>
@@ -199,6 +203,11 @@
           <figcaption class="label arch__title">How I structure a backend that talks to the outside world</figcaption>
           <p class="sr-only">Client requests pass an API gateway with a JWT guard, then a domain service that writes to the database, the source of truth. Outbound calls go through a provider adapter to a third party API, which reports back through a signature-verified webhook that is recorded in the database.</p>
 
+          <!-- The travelling light is an HTML layer above the SVG, moved with a transform only,
+               so the diagram itself is never repainted while it moves (some Android GPUs
+               tear when an SVG is repainted every frame) -->
+          <div class="arch__stage">
+          <span class="arch__dot" aria-hidden="true"></span>
           <!-- Wide layout -->
           <svg class="arch__svg arch__svg--h" viewBox="0 0 1000 310" aria-hidden="true" focusable="false">
             <defs>
@@ -208,7 +217,6 @@
               <!-- Route the light takes: through every box, then back along the webhook -->
               <path class="pulse-path" d="M105 62H885V262H625V160H850V62"/>
             </defs>
-            <g class="pulse"><circle r="11" class="pulse__glow"/><circle r="4.5" class="pulse__dot"/></g>
             <path class="wire" style="--d:0ms" pathLength="1" d="M200 62H264" marker-end="url(#ah-h)"/>
             <path class="wire" style="--d:300ms" pathLength="1" d="M460 62H524" marker-end="url(#ah-h)"/>
             <path class="wire" style="--d:600ms" pathLength="1" d="M720 62H784" marker-end="url(#ah-h)"/>
@@ -234,7 +242,6 @@
               <linearGradient id="cg-v" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C9CFF"/><stop offset=".25" stop-color="#B98CFF"/><stop offset=".5" stop-color="#FF8FD1"/><stop offset=".75" stop-color="#FFD38A"/><stop offset="1" stop-color="#7CF3E6"/></linearGradient>
               <path class="pulse-path" d="M85 40V370H275V500H85V370"/>
             </defs>
-            <g class="pulse"><circle r="11" class="pulse__glow"/><circle r="4.5" class="pulse__dot"/></g>
             <path class="wire" style="--d:0ms" pathLength="1" d="M85 70V114" marker-end="url(#ah-v)"/>
             <path class="wire" style="--d:300ms" pathLength="1" d="M85 180V224" marker-end="url(#ah-v)"/>
             <path class="wire" style="--d:600ms" pathLength="1" d="M85 290V334" marker-end="url(#ah-v)"/>
@@ -251,6 +258,7 @@
             <text class="edge-label" x="98" y="444">Webhook</text>
             <text class="sub edge-label" x="98" y="462">signature-verified</text>
           </svg>
+          </div>
           <p class="arch__more"><a href="nepay-ledger.html">One place I used it in production: the NePay ledger case study →</a></p>
         </figure>
       </div>
@@ -270,7 +278,7 @@
             <p class="label tl-date">Aug 2026 – Present</p>
             <h3 class="tl-role">Co-founder, CTO &amp; Lead Backend Engineer</h3>
             <p class="tl-org">NePay <span class="tl-sep" aria-hidden="true">|</span> Circle Technology Limited <span class="tl-sep" aria-hidden="true">|</span> <a href="https://nepay.com.ng" target="_blank" rel="noopener">nepay.com.ng</a> <span class="sr-only">(current role)</span></p>
-            <p class="tl-desc">Co-founded NePay and lead its technology and product decisions. Designed and built the whole backend as one NestJS and PostgreSQL service: identity, two factor login and KYC; wallets on an append-only ledger; naira, crypto and US dollar deposits; bank payouts; airtime, bills and gift cards; referrals and points; live support chat; and the admin panel. <a href="nepay-ledger.html">Read how the ledger works</a>.</p>
+            <p class="tl-desc">Co-founded NePay and lead its technology and product decisions. Designed and built the whole backend, 31 feature modules in one NestJS and PostgreSQL service: identity, two factor login and KYC; wallets on an append-only ledger; naira, crypto and US dollar deposits; bank payouts; airtime, bills and gift cards; referrals and points; live support chat; and the admin panel. <a href="nepay-ledger.html">Read how the ledger works</a>.</p>
           </li>
           <li class="tl-item reveal" data-skills="Next.js Socket.io">
             <span class="tl-node" aria-hidden="true"></span>

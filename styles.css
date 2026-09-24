@@ -191,7 +191,8 @@ h1, h2, h3 {
 
 .section { padding-block: var(--section-pad); }
 /* Off-screen sections skip layout and paint until they are near the viewport */
-.section:not(.hero) { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+/* #skills is excluded: its animated diagram tore on some Android GPUs inside a skipped-content layer */
+.section:not(.hero):not(#skills) { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 .section + .section { border-top: 1px solid var(--border); }
 
 .section__index { margin-bottom: 16px; }
@@ -747,11 +748,25 @@ html.skill-active [data-skills]:not(.is-match) { opacity: 0.4; transition-delay:
 .js .arch__arrow { opacity: 0; }
 .js .arch.is-drawn .arch__arrow { opacity: 1; transition: opacity 0.4s var(--ease) 1.4s; }
 
-/* The single chromatic pulse, moved along .pulse-path by main.js, colour cycling
-   through the chroma stops. It travels under the boxes, so it "enters" each one. */
-.pulse { opacity: 0; transition: opacity 0.6s var(--ease); }
-.arch.is-pulsing .pulse { opacity: 1; }
-.pulse__dot, .pulse__glow { animation: pulse-hue 16s linear infinite; }
+/* The travelling light: a small HTML layer above the diagram, moved by main.js with a
+   transform only (no SVG repaint). Static chroma gradient, no animated fill, no filter. */
+.arch__stage { position: relative; }
+.arch__dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 16%, #B98CFF 34%, color-mix(in srgb, #FF8FD1 45%, transparent) 55%, transparent 72%);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transition: opacity 0.25s var(--ease);
+}
+.arch__dot.is-on { opacity: 1; }
 
 /* A box lights up while the pulse is inside it, then fades out slowly */
 .node__glow {
@@ -770,13 +785,8 @@ html.skill-active [data-skills]:not(.is-match) { opacity: 0.4; transition-delay:
 }
 .node.is-lit .node__glow { opacity: 1; transition-duration: 0.3s; }
 .node.is-lit .node__halo { opacity: 0.28; transition-duration: 0.3s; }
-.pulse__glow { opacity: 0.3; }
-@keyframes pulse-hue {
-  0%, 100% { fill: #7C9CFF; }
-  20% { fill: #B98CFF; }
-  40% { fill: #FF8FD1; }
-  60% { fill: #FFD38A; }
-  80% { fill: #7CF3E6; }
+@media (hover: none) {
+  .node__glow, .node__halo { transition: none; }
 }
 
 /* ---------- 03 / Experience ---------- */
@@ -1171,7 +1181,7 @@ html.skill-active [data-skills]:not(.is-match) { opacity: 0.4; transition-delay:
     transition-delay: 0ms !important;
   }
   .js .reveal { opacity: 1; transform: none; }
-  .pulse { display: none; }
+  .arch__dot { display: none; }
   .js .wire { stroke-dashoffset: 0; }
   .js .arch__arrow { opacity: 1; }
   .js .blur-text:not(.is-split) { opacity: 1; }
@@ -1433,8 +1443,14 @@ tfoot td { font-weight: 500; border-top: 1px solid var(--border-strong); backgro
 .cs-banner:hover .cs-banner__cta { border-color: var(--text); }
 
 /* ---------- Hero: systems stack (wide screens only) ----------
-   The layers I work across, from the device up to the interface, as frosted panels
-   in a tilted stack. A signal lights each layer in turn, bottom to top, then repeats. */
+   The layers I work across, device up to interface, as frosted panels in a tilted stack.
+   Load: the layers assemble one by one. Loop (8s): the stack opens into an exploded view,
+   a signal rides a beam from DEVICE to INTERFACE and lights each layer as it passes, then
+   the stack closes. Packets flow across every layer the whole time.
+   Registered properties let the layer gap and signal position animate smoothly. */
+@property --gap { syntax: "<length>"; inherits: true; initial-value: 40px; }
+@property --p { syntax: "<number>"; inherits: false; initial-value: 0; }
+
 .stack { display: none; }
 @media (min-width: 1200px) {
   .stack {
@@ -1444,19 +1460,28 @@ tfoot td { font-weight: 500; border-top: 1px solid var(--border-strong); backgro
     top: 50%;
     width: 360px;
     height: 460px;
-    transform: translateY(-36%);
+    transform: translateY(-30%);
     perspective: 1400px;
     pointer-events: none;
   }
 }
 .stack__scene {
+  --gap: 40px;
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
   transform: rotateX(calc(58deg + var(--ty, 0) * 1deg)) rotateZ(calc(-36deg + var(--tx, 0) * 1deg));
-  animation: stack-float 7s ease-in-out infinite alternate;
+  animation:
+    stack-float 7s ease-in-out infinite alternate,
+    stack-explode 8s cubic-bezier(0.6, 0, 0.3, 1) 1.4s infinite;
 }
 @keyframes stack-float { to { translate: 0 -10px; } }
+@keyframes stack-explode {
+  0%, 18% { --gap: 40px; }
+  34%, 70% { --gap: 64px; }
+  88%, 100% { --gap: 40px; }
+}
+
 .stack__row {
   position: absolute;
   left: 25px;
@@ -1465,7 +1490,6 @@ tfoot td { font-weight: 500; border-top: 1px solid var(--border-strong); backgro
   height: 56px;
   display: grid;
   grid-template-columns: 84px 1fr;
-  grid-template-rows: auto;
   align-content: center;
   column-gap: 12px;
   padding: 0 18px;
@@ -1473,17 +1497,22 @@ tfoot td { font-weight: 500; border-top: 1px solid var(--border-strong); backgro
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   border: 1px solid var(--border-strong);
   box-shadow: 0 24px 40px -24px rgba(0, 0, 0, 0.55);
-  transform: translateZ(calc(var(--i) * 52px));
+  transform: translateZ(calc(var(--i) * var(--gap)));
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.05em;
   color: var(--muted);
+  /* Assemble on load: each layer slides into place, device first */
+  animation: stack-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(0.25s + var(--i) * 0.12s);
+}
+@keyframes stack-in {
+  from { opacity: 0; translate: 0 90px; }
 }
 .stack__row b { align-self: center; font-weight: 500; letter-spacing: 0.08em; color: var(--text); }
-.stack__row span:first-of-type { align-self: center; color: var(--text); white-space: nowrap; }
-/* One line per layer keeps the tilted stack legible */
-.stack__row span:last-child { display: none; }
-/* The signal: each layer's chroma edge lights in sequence, device first */
+.stack__row span { align-self: center; color: var(--text); white-space: nowrap; }
+
+/* Chroma edge: lights as the signal passes through the layer */
 .stack__row::before {
   content: "";
   position: absolute;
@@ -1495,14 +1524,81 @@ tfoot td { font-weight: 500; border-top: 1px solid var(--border-strong); backgro
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
-  animation: layer-lit 5s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 0.55s);
+  animation: layer-lit 8s ease-in-out infinite;
+  animation-delay: calc(1.4s + var(--i) * 0.64s);
 }
 @keyframes layer-lit {
-  0%, 100% { opacity: 0; }
-  8% { opacity: 1; }
-  30% { opacity: 0.15; }
-  55% { opacity: 0; }
+  0%, 31% { opacity: 0; }
+  34% { opacity: 1; }
+  46% { opacity: 0.25; }
+  58%, 100% { opacity: 0; }
 }
+
+/* Packets: a short chroma dash slides along the bottom edge of each layer, at its own pace */
+.stack__row::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  bottom: 9px;
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--chroma);
+  opacity: 0;
+  animation: packet calc(2.2s + var(--i) * 0.45s) linear infinite;
+  animation-delay: calc(1.2s + var(--i) * -0.7s);
+}
+@keyframes packet {
+  0% { transform: translateX(0); opacity: 0; }
+  12% { opacity: 0.8; }
+  88% { opacity: 0.8; }
+  100% { transform: translateX(250px); opacity: 0; }
+}
+
+/* The beam: a thin sheet standing up through the middle of the stack */
+.stack__beam {
+  position: absolute;
+  left: 179px;
+  top: 218px;
+  width: 2px;
+  height: calc(4 * var(--gap) + 20px);
+  transform-origin: 50% 0;
+  transform: rotateX(90deg);
+  background: linear-gradient(to bottom, #7CF3E6, #B98CFF 50%, #FF8FD1);
+  opacity: 0;
+  animation: beam 8s ease-in-out 1.4s infinite;
+}
+@keyframes beam {
+  0%, 26% { opacity: 0; }
+  34%, 66% { opacity: 0.55; }
+  80%, 100% { opacity: 0; }
+}
+
+/* The signal: a glowing dot that rides the beam, always turned to face the viewer */
+.stack__signal {
+  --p: 0;
+  position: absolute;
+  left: 172px;
+  top: 210px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 20%, #B98CFF 45%, transparent 72%);
+  box-shadow: 0 0 18px 6px color-mix(in srgb, #FF8FD1 45%, transparent);
+  transform: translateZ(calc(var(--p) * 4 * var(--gap) + 6px)) rotateZ(36deg) rotateX(-58deg);
+  opacity: 0;
+  animation: signal 8s cubic-bezier(0.45, 0, 0.55, 1) 1.4s infinite;
+}
+@keyframes signal {
+  0%, 30% { --p: 0; opacity: 0; }
+  34% { --p: 0; opacity: 1; }
+  66% { --p: 1; opacity: 1; }
+  74%, 100% { --p: 1; opacity: 0; }
+}
+
 .hero.is-paused .stack__scene,
-.hero.is-paused .stack__row::before { animation-play-state: paused; }
+.hero.is-paused .stack__row,
+.hero.is-paused .stack__row::before,
+.hero.is-paused .stack__row::after,
+.hero.is-paused .stack__beam,
+.hero.is-paused .stack__signal { animation-play-state: paused; }

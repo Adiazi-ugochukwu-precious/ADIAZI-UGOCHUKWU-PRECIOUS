@@ -227,8 +227,24 @@ if (arch) {
       const [x, y, w, h] = ['x', 'y', 'width', 'height'].map((a) => +rect.getAttribute(a));
       return { g, x, y, w, h };
     });
-    return { path: svg.querySelector('.pulse-path'), pulse: svg.querySelector('.pulse'), nodes };
+    const vbWidth = svg.viewBox.baseVal.width;
+    return { svg, vbWidth, path: svg.querySelector('.pulse-path'), nodes };
   });
+
+  // SVG units to CSS pixels, for placing the HTML dot over whichever SVG is showing
+  const dot = arch.querySelector('.arch__dot');
+  const stage = arch.querySelector('.arch__stage');
+  let scale = 1, offX = 0, offY = 0;
+  const measure = () => {
+    const { svg, vbWidth } = layouts[narrow.matches ? 1 : 0];
+    const r = svg.getBoundingClientRect(); // SVG elements have no offsetLeft/Top
+    const s = stage.getBoundingClientRect();
+    scale = r.width / vbWidth;
+    offX = r.left - s.left;
+    offY = r.top - s.top;
+  };
+  new ResizeObserver(measure).observe(arch);
+  narrow.addEventListener('change', measure);
 
   const TRAVEL = 16000; // ms for one full trip
   const REST = 1500;    // pause before the next trip
@@ -236,19 +252,25 @@ if (arch) {
 
   const frame = (now) => {
     raf = requestAnimationFrame(frame);
-    const { path, pulse, nodes } = layouts[narrow.matches ? 1 : 0];
+    const { path, nodes } = layouts[narrow.matches ? 1 : 0];
     const t = (now - t0) % (TRAVEL + REST);
     const moving = t < TRAVEL;
     const p = path.getPointAtLength(path.getTotalLength() * Math.min(t / TRAVEL, 1));
-    pulse.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
-    pulse.setAttribute('visibility', moving ? 'visible' : 'hidden');
-    nodes.forEach((n) => n.g.classList.toggle('is-lit', moving && p.x >= n.x && p.x <= n.x + n.w && p.y >= n.y && p.y <= n.y + n.h));
+    let inside = false;
+    nodes.forEach((n) => {
+      const hit = moving && p.x >= n.x && p.x <= n.x + n.w && p.y >= n.y && p.y <= n.y + n.h;
+      inside ||= hit;
+      n.g.classList.toggle('is-lit', hit); // only changes (and repaints) on entering or leaving a box
+    });
+    // The dot moves as its own layer; it hides while "inside" a box, so it seems to pass through
+    dot.style.transform = `translate3d(${(offX + p.x * scale).toFixed(1)}px, ${(offY + p.y * scale).toFixed(1)}px, 0)`;
+    dot.classList.toggle('is-on', moving && !inside);
   };
 
   const update = () => {
     const go = visible && arch.classList.contains('is-pulsing');
     if (go && !raf) { t0 = performance.now() - elapsed; raf = requestAnimationFrame(frame); }
-    if (!go && raf) { cancelAnimationFrame(raf); raf = 0; elapsed = performance.now() - t0; }
+    if (!go && raf) { cancelAnimationFrame(raf); raf = 0; elapsed = performance.now() - t0; dot.classList.remove('is-on'); }
   };
 
   new IntersectionObserver(([entry]) => {
@@ -257,7 +279,7 @@ if (arch) {
       started = true;
       arch.classList.add('is-drawn');
       // Start the light once the wires have finished drawing
-      if (!reducedMotion) setTimeout(() => { arch.classList.add('is-pulsing'); update(); }, 2200);
+      if (!reducedMotion) setTimeout(() => { measure(); arch.classList.add('is-pulsing'); update(); }, 2200);
     }
     update();
   }, { threshold: 0.35 }).observe(arch);
@@ -455,8 +477,8 @@ function initHero() {
       drift.y += dy;
       bg.style.transform = `translate3d(${drift.x.toFixed(2)}px, ${drift.y.toFixed(2)}px, 0)`;
       // The systems stack tilts a few degrees with the same lerped pointer
-      stack?.style.setProperty('--tx', (drift.x / 5).toFixed(2));
-      stack?.style.setProperty('--ty', (-drift.y / 5).toFixed(2));
+      stack?.style.setProperty('--tx', (drift.x / 3).toFixed(2)); // up to about ±7deg
+      stack?.style.setProperty('--ty', (-drift.y / 3).toFixed(2));
     }
     draw?.((now - start) / 1000);
   };
