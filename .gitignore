@@ -1,0 +1,14 @@
+# OS / editor junk
+.DS_Store
+Thumbs.db
+
+# Old sass / prepros tooling
+.sass-cache/
+prepros*.config
+
+# Local tooling
+node_modules/
+
+# Local files kept out of the published site
+ADIAZI-UGOCHUKWU-PRECIOUS-master.zip
+Adiazi_Ugochukwu_CV.docx
