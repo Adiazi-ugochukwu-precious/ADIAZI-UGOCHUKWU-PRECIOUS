@@ -214,10 +214,16 @@ if (arch) {
     const gradId = svg.querySelector('linearGradient').id;
     const nodes = [...svg.querySelectorAll('.node')].map((g) => {
       const rect = g.querySelector('rect');
+      // Two plain SVG copies of the box, no filters: a thin chroma outline on top,
+      // and a wide faint stroke behind it (the box's fill hides its inner half) as the glow
       const glow = rect.cloneNode();
       glow.classList.add('node__glow');
       glow.style.stroke = `url(#${gradId})`;
       rect.after(glow);
+      const halo = rect.cloneNode();
+      halo.classList.add('node__halo');
+      halo.style.stroke = `url(#${gradId})`;
+      rect.before(halo);
       const [x, y, w, h] = ['x', 'y', 'width', 'height'].map((a) => +rect.getAttribute(a));
       return { g, x, y, w, h };
     });
@@ -399,6 +405,7 @@ function initHero() {
   const hero = document.querySelector('.hero');
   const bg = hero?.querySelector('.hero__bg');
   const canvas = bg?.querySelector('canvas');
+  const stack = hero?.querySelector('.stack');
   // Reduced motion: the CSS blobs stay still, which is the single static gradient frame
   if (!canvas || reducedMotion) return;
 
@@ -447,6 +454,9 @@ function initHero() {
       drift.x += dx;
       drift.y += dy;
       bg.style.transform = `translate3d(${drift.x.toFixed(2)}px, ${drift.y.toFixed(2)}px, 0)`;
+      // The systems stack tilts a few degrees with the same lerped pointer
+      stack?.style.setProperty('--tx', (drift.x / 5).toFixed(2));
+      stack?.style.setProperty('--ty', (-drift.y / 5).toFixed(2));
     }
     draw?.((now - start) / 1000);
   };
@@ -456,6 +466,7 @@ function initHero() {
   const update = () => {
     const run = heroVisible && !document.hidden;
     bg.classList.toggle('is-paused', !run);
+    hero.classList.toggle('is-paused', !run);
     if (run && !raf && finePointer) raf = requestAnimationFrame(tick);
     if (!run && raf) { cancelAnimationFrame(raf); raf = 0; }
   };

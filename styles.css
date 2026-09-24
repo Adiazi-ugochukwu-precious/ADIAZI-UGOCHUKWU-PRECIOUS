@@ -521,6 +521,7 @@ h1, h2, h3 {
 }
 
 .hero__grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: 24px;
@@ -569,14 +570,6 @@ h1, h2, h3 {
   background: color-mix(in srgb, var(--bg) 88%, transparent);
 }
 
-/* Optional chrome object slot (see comment in index.html) */
-.hero__object { display: none; margin: 0; }
-@media (min-width: 900px) {
-  .hero__object { display: block; grid-column: 9 / -1; grid-row: 1; justify-self: end; }
-  .hero__object img { width: 100%; height: auto; animation: float 9s ease-in-out infinite alternate; }
-  .hero__grid:has(.hero__object) .hero__text { grid-column: 1 / span 8; }
-}
-@keyframes float { to { transform: translateY(-14px) rotate(3deg); } }
 
 /* ---------- Utilities ---------- */
 .sr-only {
@@ -767,9 +760,16 @@ html.skill-active [data-skills]:not(.is-match) { opacity: 0.4; transition-delay:
   opacity: 0;
   transition: opacity 1.4s var(--ease);
 }
-.node { transition: filter 1.4s var(--ease); }
-.node.is-lit { filter: drop-shadow(0 0 10px color-mix(in srgb, #B98CFF 45%, transparent)); transition-duration: 0.3s; }
+/* The soft glow is a wide, faint gradient stroke behind the box, not a CSS filter:
+   drop-shadow on animated SVG groups tears and ghosts on some Android GPUs */
+.node__halo {
+  fill: none !important;
+  stroke-width: 10 !important;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease);
+}
 .node.is-lit .node__glow { opacity: 1; transition-duration: 0.3s; }
+.node.is-lit .node__halo { opacity: 0.28; transition-duration: 0.3s; }
 .pulse__glow { opacity: 0.3; }
 @keyframes pulse-hue {
   0%, 100% { fill: #7C9CFF; }
@@ -1374,3 +1374,135 @@ tfoot td { font-weight: 500; border-top: 1px solid var(--border-strong); backgro
 }
 .diagram__hint { display: none; margin-bottom: 10px; }
 @media (max-width: 700px) { .diagram__hint { display: block; } }
+
+/* ---------- Albertronics: logo fills its card ---------- */
+.case__visual--logo::after { display: none; }
+.case__visual--logo { background: #1a0d10; }
+.case__logo-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.4);
+  filter: blur(26px) grayscale(1);
+  opacity: 0.75;
+  transition: filter 0.5s var(--ease);
+}
+.case__visual--logo .case__logo {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  transform: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.case:hover .case__logo-bg,
+.case.is-match .case__logo-bg { filter: blur(26px); }
+
+/* ---------- Case study links ---------- */
+.arch__more { margin: 20px 0 0; font-size: 15px; }
+.arch__more a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+.arch__more a:hover { border-color: var(--text); }
+
+.cs-banner {
+  display: grid;
+  gap: 8px;
+  margin-top: 24px;
+  padding: clamp(24px, 3vw, 36px);
+  text-decoration: none;
+  color: var(--text);
+}
+.cs-banner__title { font-family: var(--font-head); font-weight: 600; letter-spacing: -0.02em; font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem); line-height: 1.15; }
+.cs-banner__text { color: var(--muted); max-width: 40em; }
+.cs-banner__cta {
+  justify-self: start;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border-strong);
+}
+.cs-banner:hover .cs-banner__cta { border-color: var(--text); }
+
+/* ---------- Hero: systems stack (wide screens only) ----------
+   The layers I work across, from the device up to the interface, as frosted panels
+   in a tilted stack. A signal lights each layer in turn, bottom to top, then repeats. */
+.stack { display: none; }
+@media (min-width: 1200px) {
+  .stack {
+    display: block;
+    position: absolute;
+    right: calc(var(--gutter) - 48px);
+    top: 50%;
+    width: 360px;
+    height: 460px;
+    transform: translateY(-36%);
+    perspective: 1400px;
+    pointer-events: none;
+  }
+}
+.stack__scene {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(58deg + var(--ty, 0) * 1deg)) rotateZ(calc(-36deg + var(--tx, 0) * 1deg));
+  animation: stack-float 7s ease-in-out infinite alternate;
+}
+@keyframes stack-float { to { translate: 0 -10px; } }
+.stack__row {
+  position: absolute;
+  left: 25px;
+  top: 190px;
+  width: 310px;
+  height: 56px;
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  grid-template-rows: auto;
+  align-content: center;
+  column-gap: 12px;
+  padding: 0 18px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 24px 40px -24px rgba(0, 0, 0, 0.55);
+  transform: translateZ(calc(var(--i) * 52px));
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.stack__row b { align-self: center; font-weight: 500; letter-spacing: 0.08em; color: var(--text); }
+.stack__row span:first-of-type { align-self: center; color: var(--text); white-space: nowrap; }
+/* One line per layer keeps the tilted stack legible */
+.stack__row span:last-child { display: none; }
+/* The signal: each layer's chroma edge lights in sequence, device first */
+.stack__row::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--chroma);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  animation: layer-lit 5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.55s);
+}
+@keyframes layer-lit {
+  0%, 100% { opacity: 0; }
+  8% { opacity: 1; }
+  30% { opacity: 0.15; }
+  55% { opacity: 0; }
+}
+.hero.is-paused .stack__scene,
+.hero.is-paused .stack__row::before { animation-play-state: paused; }
