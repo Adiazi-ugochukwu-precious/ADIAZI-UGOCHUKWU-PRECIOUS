@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Adiazi Ugochukwu | Backend Engineer</title>
-  <meta name="description" content="Adiazi Ugochukwu is a backend engineer in Lagos building ledgers, payment rails and real time services.">
+  <meta name="description" content="Adiazi Ugochukwu is the co-founder and CTO of NePay and a backend engineer in Lagos building ledgers, payment rails and real time services.">
   <meta name="author" content="Adiazi Ugochukwu">
   <meta name="theme-color" content="#0A0A0B" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)">
-  <!-- Update these URLs if the site moves to a custom domain -->
-  <link rel="canonical" href="https://adiazi-ugochukwu-precious.github.io/ADIAZI-UGOCHUKWU-PRECIOUS/">
+  <!-- Live on Vercel; update these URLs if the site moves to a custom domain -->
+  <link rel="canonical" href="https://adiazi-ugochukwu-precious.vercel.app/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Adiazi Ugochukwu">
   <meta property="og:title" content="Adiazi Ugochukwu | Backend Engineer">
   <meta property="og:description" content="I build the systems money moves through: ledgers, payment rails and real time services.">
-  <meta property="og:url" content="https://adiazi-ugochukwu-precious.github.io/ADIAZI-UGOCHUKWU-PRECIOUS/">
-  <meta property="og:image" content="https://adiazi-ugochukwu-precious.github.io/ADIAZI-UGOCHUKWU-PRECIOUS/og-image.png">
+  <meta property="og:url" content="https://adiazi-ugochukwu-precious.vercel.app/">
+  <meta property="og:image" content="https://adiazi-ugochukwu-precious.vercel.app/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Adiazi Ugochukwu, backend engineer">
@@ -23,7 +23,7 @@
   <meta name="twitter:site" content="@AdiaziU">
   <meta name="twitter:title" content="Adiazi Ugochukwu | Backend Engineer">
   <meta name="twitter:description" content="I build the systems money moves through: ledgers, payment rails and real time services.">
-  <meta name="twitter:image" content="https://adiazi-ugochukwu-precious.github.io/ADIAZI-UGOCHUKWU-PRECIOUS/og-image.png">
+  <meta name="twitter:image" content="https://adiazi-ugochukwu-precious.vercel.app/og-image.png">
   <meta name="twitter:image:alt" content="Adiazi Ugochukwu, backend engineer">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -41,11 +41,9 @@
     })();
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Fonts load without blocking first paint; text shows in the fallback font until they arrive -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
+  <!-- Self-hosted fonts; the two hero fonts are preloaded so the name and line swap in quickly -->
+  <link rel="preload" href="fonts/inter-tight.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="main.js"></script>
 </head>
@@ -54,6 +52,7 @@
 
   <!-- ============ Nav ============ -->
   <header class="nav" id="site-header">
+    <span class="nav__progress" aria-hidden="true"></span>
     <div class="nav__inner">
       <a class="nav__mono" href="#top">AU<span class="sr-only"> Adiazi Ugochukwu, back to top</span></a>
 
@@ -104,7 +103,7 @@
             <a class="btn btn--ghost" href="cv/Adiazi_Ugochukwu_CV.pdf" download>Download CV</a>
           </div>
           <ul class="chips reveal" aria-label="Highlights">
-            <li class="chip">Backend Lead @ NePay</li>
+            <li class="chip">Co-founder &amp; CTO @ NePay</li>
             <li class="chip">Payments &amp; KYC integrations</li>
             <li class="chip">Systems Engineering, UNILAG</li>
           </ul>
@@ -129,12 +128,12 @@
       <div class="container grid">
         <div class="section__head">
           <p class="label section__index reveal">01 / About</p>
-          <h2 class="h2 reveal" id="about-title">About</h2>
+          <h2 class="h2 reveal" id="about-title">I build whole products, from the ledger up</h2>
         </div>
         <div class="about__body prose">
-          <p class="reveal">I'm a backend engineer and final year Systems Engineering student at the University of Lagos, graduating September 2027. I lead backend development at NePay, and before that I led backend engineering at Grup Limited.</p>
-          <p class="reveal">Most of my work sits where software meets money: append-only ledgers, idempotent webhook handling, KYC and virtual-account rails, and payment integrations with Paystack, Flutterwave and other providers. I care about systems that stay correct when providers misbehave.</p>
-          <p class="reveal">I work spec-first. Invariants get written down before code, build plans are fixed, and nothing is ‘done’ until an automated check says so.</p>
+          <p class="reveal">I'm the co-founder and CTO of NePay, a Nigerian wallet built by Circle Technology Limited, and I lead its backend engineering. I'm also in my final year of Systems Engineering at the University of Lagos, graduating in September 2027. Before NePay, I led backend engineering at Grup Limited.</p>
+          <p class="reveal">At NePay I designed and built the entire backend as one NestJS and TypeScript service on PostgreSQL: signup, two factor login and KYC; wallets on an append-only ledger; naira, crypto and US dollar deposits; bank payouts; airtime, bills and gift cards; referrals and points; live support chat; and the admin panel our operations team runs the business from. Every provider sits behind its own adapter, so we can switch one without touching the rest.</p>
+          <p class="reveal">I work spec-first. Invariants get written down before code, every route is secure by default, and nothing is ‘done’ until an automated check says so. Outside fintech I've shipped Spring Boot services, real time commerce tools and smart home integrations, and the thread through all of it is the same: systems that stay correct when providers misbehave, networks drop and requests arrive twice.</p>
         </div>
       </div>
     </section>
@@ -145,7 +144,7 @@
       <div class="container grid">
         <div class="section__head">
           <p class="label section__index reveal">02 / Skills</p>
-          <h2 class="h2 reveal" id="skills-title">Skills</h2>
+          <h2 class="h2 reveal" id="skills-title">What I build with</h2>
           <p class="muted skills__hint reveal">Hover or tap a production skill to see where I used it.</p>
         </div>
 
@@ -252,6 +251,7 @@
             <text class="edge-label" x="98" y="444">Webhook</text>
             <text class="sub edge-label" x="98" y="462">signature-verified</text>
           </svg>
+          <p class="arch__more"><a href="nepay-ledger.html">See this pattern in production: the NePay ledger case study →</a></p>
         </figure>
       </div>
     </section>
@@ -261,16 +261,16 @@
       <div class="container grid">
         <div class="section__head">
           <p class="label section__index reveal">03 / Experience</p>
-          <h2 class="h2 reveal" id="experience-title">Experience</h2>
+          <h2 class="h2 reveal" id="experience-title">Where I've worked</h2>
         </div>
 
         <ol class="timeline">
           <li class="tl-item is-current reveal" data-skills="TypeScript NestJS Node PostgreSQL MongoDB Ledger Payments JWT">
             <span class="tl-node" aria-hidden="true"></span>
             <p class="label tl-date">Aug 2026 – Present</p>
-            <h3 class="tl-role">Backend Lead &amp; Product Owner</h3>
-            <p class="tl-org">NePay <span class="sr-only">(current role)</span></p>
-            <p class="tl-desc">Lead the backend and product decisions for a Nigerian digital wallet: NestJS and PostgreSQL backend, wallet and ledger logic, third party payment and KYC integrations, two factor login and admin access control.</p>
+            <h3 class="tl-role">Co-founder, CTO &amp; Lead Backend Engineer</h3>
+            <p class="tl-org">NePay <span class="tl-sep" aria-hidden="true">|</span> Circle Technology Limited <span class="tl-sep" aria-hidden="true">|</span> <a href="https://nepay.com.ng" target="_blank" rel="noopener">nepay.com.ng</a> <span class="sr-only">(current role)</span></p>
+            <p class="tl-desc">Co-founded NePay and lead its technology and product decisions. Designed and built the whole backend as one NestJS and PostgreSQL service: identity, two factor login and KYC; wallets on an append-only ledger; naira, crypto and US dollar deposits; bank payouts; airtime, bills and gift cards; referrals and points; live support chat; and the admin panel. <a href="nepay-ledger.html">Read how the ledger works</a>.</p>
           </li>
           <li class="tl-item reveal" data-skills="Next.js Socket.io">
             <span class="tl-node" aria-hidden="true"></span>
@@ -313,21 +313,11 @@
 
         <div class="cases full">
           <article class="card case reveal" data-skills="TypeScript NestJS Node PostgreSQL MongoDB Ledger Payments JWT">
-            <div class="case__visual" aria-hidden="true">
-              <!-- Abstract placeholder: ledger rows -->
-              <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice">
-                <g class="pat">
-                  <circle cx="44" cy="46" r="4"/><rect x="60" y="43" width="150" height="6" rx="3"/><rect x="300" y="43" width="56" height="6" rx="3" class="pat--strong"/>
-                  <circle cx="44" cy="78" r="4"/><rect x="60" y="75" width="110" height="6" rx="3"/><rect x="316" y="75" width="40" height="6" rx="3" class="pat--strong"/>
-                  <circle cx="44" cy="110" r="4"/><rect x="60" y="107" width="180" height="6" rx="3"/><rect x="290" y="107" width="66" height="6" rx="3" class="pat--strong"/>
-                  <circle cx="44" cy="142" r="4"/><rect x="60" y="139" width="130" height="6" rx="3"/><rect x="306" y="139" width="50" height="6" rx="3" class="pat--strong"/>
-                  <circle cx="44" cy="174" r="4"/><rect x="60" y="171" width="96" height="6" rx="3"/><rect x="296" y="171" width="60" height="6" rx="3" class="pat--strong"/>
-                  <path d="M28 60H372M28 92H372M28 124H372M28 156H372" class="pat--line"/>
-                </g>
-              </svg>
+            <div class="case__visual case__visual--shot" aria-hidden="true">
+              <img src="images/nepay.webp" width="1600" height="900" loading="lazy" decoding="async" alt="">
             </div>
             <div class="case__body">
-              <p class="label">Digital wallet backend</p>
+              <p class="label">Co-founder &amp; CTO · Digital wallet</p>
               <h3 class="case__title">NePay</h3>
               <p class="case__problem">A wallet where every balance change has to be correct and traceable.</p>
               <p class="label case__sub">What I built</p>
@@ -339,23 +329,14 @@
               <ul class="tags" aria-label="Tech">
                 <li>TypeScript</li><li>NestJS</li><li>PostgreSQL</li><li>Ledger design</li><li>Payments</li><li>JWT</li>
               </ul>
-              <p class="case__links muted">Private product, details on request</p>
+              <p class="case__links"><a href="nepay-ledger.html">Read the case study<span class="sr-only">: designing an idempotent ledger</span></a><a href="https://nepay.com.ng" target="_blank" rel="noopener">Live site<span class="sr-only"> for NePay</span></a></p>
             </div>
           </article>
 
           <article class="card case reveal" data-skills="Next.js Socket.io">
-            <div class="case__visual" aria-hidden="true">
-              <!-- Abstract placeholder: live signal rings -->
-              <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice">
-                <g class="pat">
-                  <circle cx="200" cy="110" r="6" class="pat--strong"/>
-                  <circle cx="200" cy="110" r="34" class="pat--ring"/>
-                  <circle cx="200" cy="110" r="64" class="pat--ring"/>
-                  <circle cx="200" cy="110" r="94" class="pat--ring"/>
-                  <circle cx="200" cy="110" r="124" class="pat--ring"/>
-                  <circle cx="264" cy="110" r="4"/><circle cx="130" cy="72" r="4"/><circle cx="118" cy="168" r="4"/><circle cx="290" cy="178" r="4"/><circle cx="222" cy="18" r="4"/>
-                </g>
-              </svg>
+            <div class="case__visual case__visual--logo" aria-hidden="true">
+              <img class="case__logo-bg" src="images/albertronics.webp" width="353" height="349" loading="lazy" decoding="async" alt="">
+              <img class="case__logo" src="images/albertronics.webp" width="353" height="349" loading="lazy" decoding="async" alt="">
             </div>
             <div class="case__body">
               <p class="label">Commerce + smart home</p>
@@ -370,15 +351,21 @@
               <ul class="tags" aria-label="Tech">
                 <li>Next.js</li><li>Socket.io</li><li>WhatsApp Cloud API</li>
               </ul>
-              <!-- [TODO] Add the Albertronics live URL here as a "Live site" link -->
             </div>
           </article>
         </div>
 
+        <a class="card cs-banner full reveal" href="nepay-ledger.html">
+          <span class="label">Case study · 10 min read</span>
+          <span class="cs-banner__title">Designing an idempotent ledger at NePay</span>
+          <span class="cs-banner__text">How I made it structurally impossible for the same money movement to land twice, with the diagrams, keys and failure modes.</span>
+          <span class="cs-banner__cta" aria-hidden="true">Read the case study →</span>
+        </a>
+
         <h3 class="label builds__title full reveal">Earlier builds</h3>
         <ul class="builds full">
           <li class="card build reveal">
-            <img src="images/chatroom.webp" width="1200" height="960" loading="lazy" decoding="async" alt="Screenshot of the chat room with several users' messages">
+            <div class="shot"><span class="shot__bar" aria-hidden="true"><i></i><i></i><i></i></span><img src="images/chatroom.webp" width="1200" height="960" loading="lazy" decoding="async" alt="Screenshot of the chat room with several users' messages"></div>
             <div class="build__body">
               <h4 class="build__name">Real time chat room</h4>
               <p>Chat room for up to 50 people at once, with profile picture updates.</p>
@@ -389,7 +376,7 @@
             </div>
           </li>
           <li class="card build reveal">
-            <img src="images/weather.webp" width="1200" height="713" loading="lazy" decoding="async" alt="Screenshot of the Weather Pulse app with a city search box">
+            <div class="shot"><span class="shot__bar" aria-hidden="true"><i></i><i></i><i></i></span><img src="images/weather.webp" width="1200" height="713" loading="lazy" decoding="async" alt="Screenshot of the Weather Pulse app with a city search box"></div>
             <div class="build__body">
               <h4 class="build__name">Weather app</h4>
               <p>Search a city and get its current weather.</p>
@@ -400,7 +387,7 @@
             </div>
           </li>
           <li class="card build reveal">
-            <img src="images/crud.webp" width="1200" height="630" loading="lazy" decoding="async" alt="Screenshot of the CRUD app with an add item form and item list">
+            <div class="shot"><span class="shot__bar" aria-hidden="true"><i></i><i></i><i></i></span><img src="images/crud.webp" width="1200" height="630" loading="lazy" decoding="async" alt="Screenshot of the CRUD app with an add item form and item list"></div>
             <div class="build__body">
               <h4 class="build__name">CRUD app</h4>
               <p>Add, edit and remove items with quantities in a simple list.</p>
@@ -411,7 +398,7 @@
             </div>
           </li>
           <li class="card build reveal">
-            <img src="images/todo.webp" width="1200" height="614" loading="lazy" decoding="async" alt="Screenshot of the to-do list app">
+            <div class="shot"><span class="shot__bar" aria-hidden="true"><i></i><i></i><i></i></span><img src="images/todo.webp" width="1200" height="614" loading="lazy" decoding="async" alt="Screenshot of the to-do list app"></div>
             <div class="build__body">
               <h4 class="build__name">To-do list</h4>
               <p>Add tasks with a due date and category, and keep count of what's left.</p>
@@ -422,7 +409,7 @@
             </div>
           </li>
           <li class="card build reveal">
-            <img src="images/ecommerce.webp" width="1200" height="596" loading="lazy" decoding="async" alt="Screenshot of the Snapstyle storefront homepage">
+            <div class="shot"><span class="shot__bar" aria-hidden="true"><i></i><i></i><i></i></span><img src="images/ecommerce.webp" width="1200" height="596" loading="lazy" decoding="async" alt="Screenshot of the Snapstyle storefront homepage"></div>
             <div class="build__body">
               <h4 class="build__name">E-commerce UI</h4>
               <p>Storefront homepage design for an online fashion and tech shop.</p>
@@ -433,6 +420,31 @@
             </div>
           </li>
         </ul>
+
+        <!-- Testimonials: approved by Ugochukwu Nebeani and Dubem Egbo on 2026-09-24 -->
+        <div class="quotes-wrap full">
+          <h3 class="label builds__title reveal">What people say</h3>
+          <div class="quotes">
+            <figure class="card quote reveal">
+              <blockquote>
+                <p>Adiazi owns NePay's backend the way a founder would. He writes the rules down before any code, pushes back when something could put a customer's balance at risk, and ships work I don't have to double check. Every naira in our ledger can be traced, and that is down to him.</p>
+              </blockquote>
+              <figcaption>
+                <span class="quote__avatar" aria-hidden="true">UN</span>
+                <span><strong>Ugochukwu Nebeani</strong><span class="label">CEO, NePay</span></span>
+              </figcaption>
+            </figure>
+            <figure class="card quote reveal">
+              <blockquote>
+                <p>Working with Adiazi is easy because he thinks about the product, not just the endpoint. He agrees the API with us before building, explains tradeoffs in plain language, and when a design asks for something the backend can't safely do, he comes back with an option that works for both sides.</p>
+              </blockquote>
+              <figcaption>
+                <span class="quote__avatar" aria-hidden="true">DE</span>
+                <span><strong>Dubem Egbo</strong><span class="label">Product Designer, NePay</span></span>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -441,7 +453,7 @@
       <div class="container grid">
         <div class="section__head">
           <p class="label section__index reveal">05 / Education</p>
-          <h2 class="h2 reveal" id="education-title">Education</h2>
+          <h2 class="h2 reveal" id="education-title">Where I studied</h2>
         </div>
         <ul class="edu">
           <li class="edu__row reveal">

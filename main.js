@@ -17,9 +17,36 @@ applyTheme(root.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
 
 themeBtn?.addEventListener('click', () => {
   const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
+  const swap = () => applyTheme(next);
   try { localStorage.setItem('theme', next); } catch (e) { /* storage blocked: choice lasts this visit only */ }
+
+  // Where supported, the new theme grows in a circle from the toggle; otherwise it just switches
+  if (!document.startViewTransition || reducedMotion) { swap(); return; }
+  const r = themeBtn.getBoundingClientRect();
+  const x = r.left + r.width / 2;
+  const y = r.top + r.height / 2;
+  const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  document.startViewTransition(swap).ready.then(() => {
+    root.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+      { duration: 550, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)', pseudoElement: '::view-transition-new(root)' },
+    );
+  });
 });
+
+// ---------- Reading progress hairline in the nav ----------
+const progress = document.querySelector('.nav__progress');
+if (progress) {
+  let queued = false;
+  const setProgress = () => {
+    queued = false;
+    const max = root.scrollHeight - innerHeight;
+    progress.style.setProperty('--p', max > 0 ? (scrollY / max).toFixed(4) : 0);
+  };
+  addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(setProgress); } }, { passive: true });
+  addEventListener('resize', setProgress);
+  requestAnimationFrame(setProgress); // not during start-up: reading scrollHeight forces a full layout
+}
 
 // ---------- Mobile menu (overlay, focus trap, Esc to close) ----------
 const header = document.getElementById('site-header');
@@ -112,7 +139,7 @@ const revealer = new IntersectionObserver((entries) => {
   entries.filter((e) => e.isIntersecting).forEach((entry, i) => {
     entry.target.style.setProperty('--delay', `${i * 60}ms`);
     entry.target.classList.add('is-visible');
-    if (!reducedMotion && entry.target.matches('.section__index, .hero .label')) decrypt(entry.target);
+    if (!reducedMotion && entry.target.matches('.section__index')) decrypt(entry.target);
     revealer.unobserve(entry.target);
   });
 }, { rootMargin: '0px 0px -8% 0px' });
@@ -228,6 +255,25 @@ if (arch) {
     }
     update();
   }, { threshold: 0.35 }).observe(arch);
+}
+
+// ---------- Case study page: draw diagrams on scroll, track the contents list ----------
+const diagramObserver = new IntersectionObserver((entries) => {
+  entries.filter((e) => e.isIntersecting).forEach((e) => {
+    e.target.classList.add('is-drawn');
+    diagramObserver.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.diagram').forEach((d) => diagramObserver.observe(d));
+
+const tocLinks = [...document.querySelectorAll('.toc a')];
+if (tocLinks.length) {
+  const tocObserver = new IntersectionObserver((entries) => {
+    entries.filter((e) => e.isIntersecting).forEach((e) => {
+      tocLinks.forEach((a) => a.classList.toggle('is-active', a.hash === `#${e.target.id}`));
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  document.querySelectorAll('.cs-section[id]').forEach((s) => tocObserver.observe(s));
 }
 
 // ---------- Contact form: submit with fetch and show the result inline ----------
@@ -357,24 +403,32 @@ function initHero() {
   if (!canvas || reducedMotion) return;
 
   // The CSS blobs render first everywhere. On mouse-driven desktops the WebGL shader is
-  // compiled once the browser is idle after load, then cross-fades in over the blobs.
+  // compiled on the visitor's first mouse move or scroll (so never during page load),
+  // in an idle moment, then cross-fades in over the blobs.
   // Phones keep the blobs: cheaper on battery and never blocks the main thread.
   let draw = null;
   if (window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 900px)').matches) {
-    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1200));
-    window.addEventListener('load', () => idle(() => {
-      draw = createShader(canvas);
-      if (!draw) return;
-      requestAnimationFrame(() => {
-        bg.classList.add('gl-ready');
-        setTimeout(() => bg.classList.add('gl-done'), 1200); // blobs fully hidden, stop animating them
+    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
+    const startGL = () => {
+      removeEventListener('pointermove', startGL);
+      removeEventListener('scroll', startGL);
+      idle(() => {
+        draw = createShader(canvas);
+        if (!draw) return;
+        requestAnimationFrame(() => {
+          bg.classList.add('gl-ready');
+          setTimeout(() => bg.classList.add('gl-done'), 1200); // blobs fully hidden, stop animating them
+        });
       });
-    }), { once: true });
+    };
+    addEventListener('pointermove', startGL, { passive: true });
+    addEventListener('scroll', startGL, { passive: true });
   }
 
   // Pointer drift, desktop only: lerp toward the target, capped at 20px
   const drift = { x: 0, y: 0, tx: 0, ty: 0 };
-  if (window.matchMedia('(pointer: fine)').matches) {
+  const finePointer = window.matchMedia('(pointer: fine)').matches;
+  if (finePointer) {
     window.addEventListener('pointermove', (e) => {
       drift.tx = (e.clientX / window.innerWidth - 0.5) * 40;
       drift.ty = (e.clientY / window.innerHeight - 0.5) * 40;
@@ -387,17 +441,22 @@ function initHero() {
     raf = requestAnimationFrame(tick);
     if (now - last < 33) return; // ~30fps is plenty for a slow drift
     last = now;
-    drift.x += (drift.tx - drift.x) * 0.08;
-    drift.y += (drift.ty - drift.y) * 0.08;
-    bg.style.transform = `translate3d(${drift.x.toFixed(2)}px, ${drift.y.toFixed(2)}px, 0)`;
+    const dx = (drift.tx - drift.x) * 0.08;
+    const dy = (drift.ty - drift.y) * 0.08;
+    if (Math.abs(dx) + Math.abs(dy) > 0.01) { // skip the style write when nothing moved
+      drift.x += dx;
+      drift.y += dy;
+      bg.style.transform = `translate3d(${drift.x.toFixed(2)}px, ${drift.y.toFixed(2)}px, 0)`;
+    }
     draw?.((now - start) / 1000);
   };
 
-  // Run only while the hero is on screen and the tab is visible
+  // Run only while the hero is on screen and the tab is visible. On touch devices there is
+  // no drift and no WebGL, so no frame loop at all: only the CSS blobs, paused off screen.
   const update = () => {
     const run = heroVisible && !document.hidden;
     bg.classList.toggle('is-paused', !run);
-    if (run && !raf) raf = requestAnimationFrame(tick);
+    if (run && !raf && finePointer) raf = requestAnimationFrame(tick);
     if (!run && raf) { cancelAnimationFrame(raf); raf = 0; }
   };
   new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; update(); }).observe(hero);

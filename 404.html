@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found | Adiazi Ugochukwu</title>
+  <meta name="robots" content="noindex">
+  <script>
+    (function () {
+      var d = document.documentElement, t = null;
+      try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      d.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <!-- Root-relative so this page works at any missing URL depth -->
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="notfound">
+    <div class="notfound__bg" aria-hidden="true">
+      <div class="blob blob--1"></div>
+      <div class="blob blob--2"></div>
+      <div class="blob blob--3"></div>
+    </div>
+    <div class="container">
+      <p class="label">404 · Not found</p>
+      <h1 class="notfound__title"><span class="chroma-text">This page isn't in the ledger.</span></h1>
+      <p class="muted notfound__line">The link may be old, or the address has a typo.</p>
+      <a class="btn btn--primary" href="/">Back to the homepage</a>
+    </div>
+  </main>
+</body>
+</html>
