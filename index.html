@@ -212,7 +212,6 @@
           <svg class="arch__svg arch__svg--h" viewBox="0 0 1000 310" aria-hidden="true" focusable="false">
             <defs>
               <marker id="ah-h" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="arch__arrow" d="M0 0L8 4L0 8z"/></marker>
-              <mask id="wm-h" maskUnits="userSpaceOnUse"><path class="wire wire--mask" style="--d:1500ms" pathLength="1" d="M625 226V160H850V98"/></mask>
               <linearGradient id="cg-h" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C9CFF"/><stop offset=".25" stop-color="#B98CFF"/><stop offset=".5" stop-color="#FF8FD1"/><stop offset=".75" stop-color="#FFD38A"/><stop offset="1" stop-color="#7CF3E6"/></linearGradient>
               <!-- Route the light takes: through every box, then back along the webhook -->
               <path class="pulse-path" d="M105 62H885V262H625V160H850V62"/>
@@ -222,7 +221,7 @@
             <path class="wire" style="--d:600ms" pathLength="1" d="M720 62H784" marker-end="url(#ah-h)"/>
             <path class="wire" style="--d:900ms" pathLength="1" d="M885 94V224" marker-end="url(#ah-h)"/>
             <path class="wire" style="--d:1200ms" pathLength="1" d="M790 262H726" marker-end="url(#ah-h)"/>
-            <path class="wire--dashed" mask="url(#wm-h)" d="M625 226V160H850V98" marker-end="url(#ah-h)"/>
+            <path class="wire--dashed" d="M625 226V160H850V98" marker-end="url(#ah-h)"/>
 
             <g class="node"><rect x="10" y="30" width="190" height="64" rx="12"/><text x="105" y="67">Client</text></g>
             <g class="node"><rect x="270" y="30" width="190" height="64" rx="12"/><text x="365" y="58">API Gateway</text><text class="sub" x="365" y="78">JWT guard</text></g>
@@ -238,7 +237,6 @@
           <svg class="arch__svg arch__svg--v" viewBox="0 0 360 540" aria-hidden="true" focusable="false">
             <defs>
               <marker id="ah-v" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="arch__arrow" d="M0 0L8 4L0 8z"/></marker>
-              <mask id="wm-v" maskUnits="userSpaceOnUse"><path class="wire wire--mask" style="--d:1500ms" pathLength="1" d="M200 500H85V404"/></mask>
               <linearGradient id="cg-v" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C9CFF"/><stop offset=".25" stop-color="#B98CFF"/><stop offset=".5" stop-color="#FF8FD1"/><stop offset=".75" stop-color="#FFD38A"/><stop offset="1" stop-color="#7CF3E6"/></linearGradient>
               <path class="pulse-path" d="M85 40V370H275V500H85V370"/>
             </defs>
@@ -247,7 +245,7 @@
             <path class="wire" style="--d:600ms" pathLength="1" d="M85 290V334" marker-end="url(#ah-v)"/>
             <path class="wire" style="--d:900ms" pathLength="1" d="M160 370H194" marker-end="url(#ah-v)"/>
             <path class="wire" style="--d:1200ms" pathLength="1" d="M275 400V464" marker-end="url(#ah-v)"/>
-            <path class="wire--dashed" mask="url(#wm-v)" d="M200 500H85V404" marker-end="url(#ah-v)"/>
+            <path class="wire--dashed" d="M200 500H85V404" marker-end="url(#ah-v)"/>
 
             <g class="node"><rect x="10" y="10" width="150" height="60" rx="12"/><text x="85" y="45">Client</text></g>
             <g class="node"><rect x="10" y="120" width="150" height="60" rx="12"/><text x="85" y="146">API Gateway</text><text class="sub" x="85" y="165">JWT guard</text></g>

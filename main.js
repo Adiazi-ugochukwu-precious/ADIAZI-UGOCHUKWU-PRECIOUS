@@ -210,22 +210,26 @@ livePills.forEach((pill) => {
 const arch = document.querySelector('.arch');
 if (arch) {
   const narrow = window.matchMedia('(max-width: 899px)');
+  // Phones never repaint the SVG after it draws in: their glow is an HTML halo behind it.
+  // Desktops also get a thin chroma outline drawn in the SVG itself.
+  const svgGlow = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const stageEl = arch.querySelector('.arch__stage');
   const layouts = [...arch.querySelectorAll('.arch__svg')].map((svg) => {
     const gradId = svg.querySelector('linearGradient').id;
     const nodes = [...svg.querySelectorAll('.node')].map((g) => {
       const rect = g.querySelector('rect');
-      // Two plain SVG copies of the box, no filters: a thin chroma outline on top,
-      // and a wide faint stroke behind it (the box's fill hides its inner half) as the glow
-      const glow = rect.cloneNode();
-      glow.classList.add('node__glow');
-      glow.style.stroke = `url(#${gradId})`;
-      rect.after(glow);
-      const halo = rect.cloneNode();
-      halo.classList.add('node__halo');
-      halo.style.stroke = `url(#${gradId})`;
-      rect.before(halo);
+      if (svgGlow) {
+        const glow = rect.cloneNode();
+        glow.classList.add('node__glow');
+        glow.style.stroke = `url(#${gradId})`;
+        rect.after(glow);
+      }
+      const halo = document.createElement('span');
+      halo.className = 'arch__halo';
+      halo.setAttribute('aria-hidden', 'true');
+      stageEl.append(halo);
       const [x, y, w, h] = ['x', 'y', 'width', 'height'].map((a) => +rect.getAttribute(a));
-      return { g, x, y, w, h };
+      return { g, halo, x, y, w, h };
     });
     const vbWidth = svg.viewBox.baseVal.width;
     return { svg, vbWidth, path: svg.querySelector('.pulse-path'), nodes };
@@ -242,6 +246,16 @@ if (arch) {
     scale = r.width / vbWidth;
     offX = r.left - s.left;
     offY = r.top - s.top;
+    layouts.forEach((layout, li) => layout.nodes.forEach((n) => {
+      n.halo.hidden = li !== (narrow.matches ? 1 : 0);
+      Object.assign(n.halo.style, {
+        left: `${offX + n.x * scale}px`,
+        top: `${offY + n.y * scale}px`,
+        width: `${n.w * scale}px`,
+        height: `${n.h * scale}px`,
+        borderRadius: `${12 * scale}px`,
+      });
+    }));
   };
   new ResizeObserver(measure).observe(arch);
   narrow.addEventListener('change', measure);
@@ -260,7 +274,8 @@ if (arch) {
     nodes.forEach((n) => {
       const hit = moving && p.x >= n.x && p.x <= n.x + n.w && p.y >= n.y && p.y <= n.y + n.h;
       inside ||= hit;
-      n.g.classList.toggle('is-lit', hit); // only changes (and repaints) on entering or leaving a box
+      n.halo.classList.toggle('is-lit', hit);            // compositor-only opacity fade
+      if (svgGlow) n.g.classList.toggle('is-lit', hit);  // desktop outline (SVG repaint)
     });
     // The dot moves as its own layer; it hides while "inside" a box, so it seems to pass through
     dot.style.transform = `translate3d(${(offX + p.x * scale).toFixed(1)}px, ${(offY + p.y * scale).toFixed(1)}px, 0)`;

@@ -707,7 +707,7 @@ html.skill-active [data-skills]:not(.is-match) { opacity: 0.4; transition-delay:
 }
 .arch__title { margin-bottom: 24px; }
 
-.arch__svg { width: 100%; height: auto; overflow: visible; }
+.arch__svg { position: relative; z-index: 1; width: 100%; height: auto; overflow: visible; }
 .arch__svg--v { display: none; max-width: 400px; margin-inline: auto; }
 @media (max-width: 899px) {
   .arch__svg--h { display: none; }
@@ -736,7 +736,9 @@ html.skill-active [data-skills]:not(.is-match) { opacity: 0.4; transition-delay:
 .arch__arrow { fill: var(--muted); }
 .wire, .wire--dashed { fill: none; stroke: var(--muted); stroke-width: 1.25; }
 .wire--dashed { stroke-dasharray: 4 5; }
-.wire--mask { stroke: #fff; stroke-width: 6; }
+/* The webhook line fades in after the wires draw (no SVG mask: masks tear on some Android GPUs) */
+.js .arch .wire--dashed { opacity: 0; transition: opacity 0.6s var(--ease) 1.5s; }
+.js .arch.is-drawn .wire--dashed { opacity: 1; }
 
 /* Draw on scroll: each wire runs from dashoffset 1 to 0 (pathLength="1") */
 .js .wire { stroke-dasharray: 1; stroke-dashoffset: 1; }
@@ -767,27 +769,35 @@ html.skill-active [data-skills]:not(.is-match) { opacity: 0.4; transition-delay:
   transition: opacity 0.25s var(--ease);
 }
 .arch__dot.is-on { opacity: 1; }
+.arch__dot { z-index: 2; }
 
-/* A box lights up while the pulse is inside it, then fades out slowly */
+/* A lit box's glow: an HTML layer behind the SVG (the box's own fill hides its middle),
+   faded with opacity only, so lighting a box never repaints the SVG */
+.arch__halo {
+  position: absolute;
+  z-index: 0;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, #B98CFF 85%, transparent),
+    0 0 22px 5px color-mix(in srgb, #B98CFF 40%, transparent),
+    0 0 44px 12px color-mix(in srgb, #7CF3E6 16%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  transition: opacity 1.2s var(--ease);
+}
+.arch__halo.is-lit { opacity: 1; transition-duration: 0.3s; }
+.arch__halo[hidden] { display: none; }
+
+/* Desktop only: a thin chroma outline drawn in the SVG while the light is inside a box.
+   (The soft glow everywhere is the HTML .arch__halo, so phones never repaint the SVG.) */
 .node__glow {
   fill: none !important;
   stroke-width: 1.5 !important;
   opacity: 0;
   transition: opacity 1.4s var(--ease);
 }
-/* The soft glow is a wide, faint gradient stroke behind the box, not a CSS filter:
-   drop-shadow on animated SVG groups tears and ghosts on some Android GPUs */
-.node__halo {
-  fill: none !important;
-  stroke-width: 10 !important;
-  opacity: 0;
-  transition: opacity 1.4s var(--ease);
-}
 .node.is-lit .node__glow { opacity: 1; transition-duration: 0.3s; }
-.node.is-lit .node__halo { opacity: 0.28; transition-duration: 0.3s; }
-@media (hover: none) {
-  .node__glow, .node__halo { transition: none; }
-}
 
 /* ---------- 03 / Experience ---------- */
 .timeline {
@@ -1380,7 +1390,8 @@ tfoot td { font-weight: 500; border-top: 1px solid var(--border-strong); backgro
 .js .diagram.is-drawn .wire--dashed { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .js .diagram .arch__arrow,
-  .js .diagram .wire--dashed { opacity: 1; }
+  .js .diagram .wire--dashed,
+  .js .arch .wire--dashed { opacity: 1; }
 }
 .diagram__hint { display: none; margin-bottom: 10px; }
 @media (max-width: 700px) { .diagram__hint { display: block; } }
